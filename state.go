@@ -8,6 +8,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/ayachain/go-aya-alvm/parse"
+	"github.com/ipfs/go-cid"
+	"github.com/ipfs/go-datastore"
+	"github.com/ipfs/go-ipfs/core"
+	dag "github.com/ipfs/go-merkledag"
+	"github.com/ipfs/go-mfs"
 	"io"
 	"math"
 	"os"
@@ -1325,6 +1330,34 @@ func (ls *LState) setFieldString(obj LValue, key string, value LValue) {
 /* }}} */
 
 /* api methods {{{ */
+func NewAVMState( aappns string, pnode *dag.ProtoNode, ind *core.IpfsNode, opts ...Options ) *LState {
+
+	l := NewState( opts... )
+	l.ProtoNode = pnode
+	l.ipfsnode = ind
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	dsk := datastore.NewKey("/alvm/" + aappns)
+
+	vfs, err := mfs.NewRoot(
+		ctx,
+		ind.DAG,
+		pnode,
+		func(ctx context.Context, c cid.Cid) error {
+			return ind.Repo.Datastore().Put(dsk, c.Bytes())
+		})
+
+	if err != nil {
+		return nil
+	}
+
+	l.mfsRoot = vfs
+
+	return l
+
+}
 
 func NewState(opts ...Options) *LState {
 	var ls *LState

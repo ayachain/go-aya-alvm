@@ -3,6 +3,9 @@ package lua
 import (
 	"context"
 	"fmt"
+	"github.com/ipfs/go-ipfs/core"
+	dag "github.com/ipfs/go-merkledag"
+	"github.com/ipfs/go-mfs"
 	"os"
 )
 
@@ -207,7 +210,10 @@ type LState struct {
 	Panic   func(*LState)
 	Dead    bool
 	Options Options
+	ProtoNode *dag.ProtoNode
 
+	mfsRoot		 *mfs.Root
+	ipfsnode	 *core.IpfsNode
 	stop         int32
 	reg          *registry
 	stack        callFrameStack
