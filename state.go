@@ -11,9 +11,11 @@ import (
 	"github.com/ipfs/go-cid"
 	"github.com/ipfs/go-datastore"
 	"github.com/ipfs/go-ipfs/core"
+	"github.com/ipfs/go-merkledag"
 	dag "github.com/ipfs/go-merkledag"
 	"github.com/ipfs/go-mfs"
 	"io"
+	"log"
 	"math"
 	"os"
 	"runtime"
@@ -1333,21 +1335,55 @@ func (ls *LState) setFieldString(obj LValue, key string, value LValue) {
 func NewAVMState( aappns string, pnode *dag.ProtoNode, ind *core.IpfsNode, opts ...Options ) *LState {
 
 	l := NewState( opts... )
-	l.ProtoNode = pnode
 	l.ipfsnode = ind
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	dsk := datastore.NewKey("/alvm/" + aappns)
+	var nd *merkledag.ProtoNode
+	val, err := ind.Repo.Datastore().Get(dsk)
+
+	switch {
+	case err == datastore.ErrNotFound || val == nil:
+		nd = pnode
+
+	case err == nil:
+		c, err := cid.Cast(val)
+		if err != nil {
+			return nil
+		}
+
+		rnd, err := ind.DAG.Get(ctx, c)
+		if err != nil {
+			return nil
+		}
+
+		pbnd, ok := rnd.(*merkledag.ProtoNode)
+		if !ok {
+			return nil
+		}
+
+		nd = pbnd
+
+	default:
+		return nil
+	}
+
+	l.ProtoNode = nd
+
+	pf := func(ctx context.Context, c cid.Cid) error {
+		log.Println("PUBLISHED.")
+		//return ind.Repo.Datastore().Put(dsk, c.Bytes())
+		return nil
+	}
 
 	vfs, err := mfs.NewRoot(
 		ctx,
 		ind.DAG,
-		pnode,
-		func(ctx context.Context, c cid.Cid) error {
-			return ind.Repo.Datastore().Put(dsk, c.Bytes())
-		})
+		nd,
+		pf,
+		)
 
 	if err != nil {
 		return nil
@@ -1356,7 +1392,6 @@ func NewAVMState( aappns string, pnode *dag.ProtoNode, ind *core.IpfsNode, opts 
 	l.mfsRoot = vfs
 
 	return l
-
 }
 
 func NewState(opts ...Options) *LState {

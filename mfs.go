@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	cid "github.com/ipfs/go-cid"
+	"github.com/ipfs/go-cid"
 	ipld "github.com/ipfs/go-ipld-format"
 	dag "github.com/ipfs/go-merkledag"
 	"github.com/ipfs/go-mfs"
@@ -288,7 +288,12 @@ func ( l *LState ) MFS_Flush( path string ) (cid.Cid, error) {
 		return cid.Cid{}, err
 	}
 
-	n, err := mfs.FlushPath(context.Background(), l.mfsRoot, path)
+	//n, err := mfs.FlushPath(context.Background(), l.mfsRoot, path)
+
+	ctx, cancel := context.WithCancel( context.Background() )
+	defer cancel()
+
+	n, err := mfs.FlushPath(ctx, l.mfsRoot, path)
 	if err != nil {
 		return cid.Cid{}, err
 	} else {
