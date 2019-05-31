@@ -14,6 +14,7 @@ import (
 	"github.com/ipfs/go-merkledag"
 	dag "github.com/ipfs/go-merkledag"
 	"github.com/ipfs/go-mfs"
+	"github.com/pkg/errors"
 	"io"
 	"log"
 	"math"
@@ -1337,7 +1338,7 @@ func (ls *LState) setFieldString(obj LValue, key string, value LValue) {
 /* }}} */
 
 /* api methods {{{ */
-func NewAVMState( ctx context.Context, aappns string, pnode *dag.ProtoNode, ind *core.IpfsNode, opts ...Options ) *LState {
+func NewAVMState( ctx context.Context, aappns string, pnode *dag.ProtoNode, ind *core.IpfsNode, opts ...Options ) (*LState, error) {
 
 	l := NewState( opts... )
 	l.ipfsnode = ind
@@ -1353,23 +1354,24 @@ func NewAVMState( ctx context.Context, aappns string, pnode *dag.ProtoNode, ind 
 	case err == nil:
 		c, err := cid.Cast(val)
 		if err != nil {
-			return nil
+			return nil, err
 		}
 
 		rnd, err := ind.DAG.Get(ctx, c)
 		if err != nil {
-			return nil
+			return nil, err
 		}
 
 		pbnd, ok := rnd.(*merkledag.ProtoNode)
 		if !ok {
-			return nil
+			return nil, errors.New("conver ProtoNode failed.")
 		}
 
 		nd = pbnd
 
 	default:
-		return nil
+
+		return nil, errors.New("error parmas.")
 	}
 
 	l.ProtoNode = nd
@@ -1388,7 +1390,7 @@ func NewAVMState( ctx context.Context, aappns string, pnode *dag.ProtoNode, ind 
 		)
 
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	l.mfsRoot = vfs
@@ -1404,26 +1406,25 @@ func NewAVMState( ctx context.Context, aappns string, pnode *dag.ProtoNode, ind 
 
 	mfil, lerr := l.MFS_LookupFile(ALVM_PATH_Maincript)
 	if lerr != nil {
-		return nil
+		return nil, lerr
 	}
 
 	mrd, lerr := mfil.Open( mfs.Flags{Read:true} )
 	if lerr != nil {
-		return nil
+		return nil, lerr
 	}
 
 	lfn, lerr := l.Load( mrd, "_aapp.lua" )
 	if lerr != nil {
-		return nil
+		return nil, lerr
 	}
 
 	l.Push(lfn)
 	lerr = l.PCall(0, MultRet, nil)
 	if lerr != nil {
-		return nil
+		return nil, lerr
 	}
-
-	return l
+	return l, nil
 }
 
 func NewState(opts ...Options) *LState {

@@ -429,8 +429,7 @@ func fileReadAux(L *LState, file *lFile, idx int) int {
 				switch opt {
 				case 'n':
 					var v LNumber
-					var n int
-					n, err = fmt.Fscanf(buffrd, LNumberScanFormat, &v)
+					_, err = fmt.Fscanf(buffrd, LNumberScanFormat, &v)
 					if err == io.EOF {
 						file.seek = file.Size()
 						L.Push(LNil)
@@ -440,7 +439,7 @@ func fileReadAux(L *LState, file *lFile, idx int) int {
 						goto errreturn
 					}
 
-					file.seek += int64(n)
+					file.seek += int64(len(v.String()))
 					L.Push(v)
 
 				case 'a':
@@ -467,11 +466,14 @@ func fileReadAux(L *LState, file *lFile, idx int) int {
 						L.Push(LNil)
 						goto normalreturn
 					}
+
 					if err != nil {
 						goto errreturn
 					}
 
-					file.seek += int64(len(buf))
+					if !iseof {
+						file.seek += int64(len(buf) + 1)
+					}
 					L.Push(LString(string(buf)))
 
 				default:
@@ -509,22 +511,27 @@ func fileSeek(L *LState) int {
 		L.Push(LNumber(0))
 	}
 
-	var pos int64
+	oindex := L.CheckOption(2, fileSeekOptions)
+
+	var spos int64
 	var err error
-	var size int64
 
-	pos = int64(L.CheckOption(2, fileSeekOptions)) + L.CheckInt64(3)
-
-	size, err = file.vfp.Size()
-	if err != nil {
-		goto errreturn
+	switch oindex{
+	case 0: //start
+		spos = 0
+	case 1: //cur
+		spos = file.seek
+	case 2: //end
+		spos = file.Size()
 	}
 
-	if pos >= size {
+	pos := int64( spos + L.CheckInt64(3) )
+	if pos >= file.Size() {
 		err = fmt.Errorf("offset was past end of file (%d > %d)", pos, size)
 		goto errreturn
 	}
 
+	file.seek = pos
 	L.Push(LNumber(pos))
 	return 1
 
@@ -619,8 +626,8 @@ func ioInput(L *LState) int {
 			L.Push(lv)
 			return 1
 		}
-
 	}
+
 	L.ArgError(1, "string or file expedted, but got "+L.Get(1).Type().String())
 	return 0
 }
@@ -643,7 +650,6 @@ func ioLinesIter(L *LState) int {
 		file = L.Get(UpvalueIndex(2)).(*LUserData).Value.(*lFile)
 		toclose = true
 	}
-
 
 	rd, err := file.getReader(L)
 	defer func() {

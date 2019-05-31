@@ -24,9 +24,8 @@ require (
 )
 
 replace (
-    github.com/ipfs/go-ipfs => ../../ipfs/go-ipfs
-    github.com/ayachain/go-aya-alvm-json => ../../ayachain/go-aya-alvm-json
+	github.com/ayachain/go-aya-alvm-json => ../../ayachain/go-aya-alvm-json
+	github.com/ipfs/go-ipfs => ../../ipfs/go-ipfs
 )
-
 
 go 1.12

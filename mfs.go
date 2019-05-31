@@ -289,8 +289,6 @@ func ( l *LState ) MFS_Flush( path string ) (cid.Cid, error) {
 		return cid.Cid{}, err
 	}
 
-	//n, err := mfs.FlushPath(context.Background(), l.mfsRoot, path)
-
 	ctx, cancel := context.WithCancel( context.Background() )
 	defer cancel()
 
