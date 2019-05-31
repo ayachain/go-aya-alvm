@@ -23,6 +23,10 @@ require (
 	google.golang.org/appengine v1.4.0 // indirect
 )
 
-replace github.com/ipfs/go-ipfs => ../../ipfs/go-ipfs
+replace (
+    github.com/ipfs/go-ipfs => ../../ipfs/go-ipfs
+    github.com/ayachain/go-aya-alvm-json => ../../ayachain/go-aya-alvm-json
+)
+
 
 go 1.12

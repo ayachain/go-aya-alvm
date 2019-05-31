@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/ipfs/go-mfs"
 	"io"
 	"io/ioutil"
 	"os"

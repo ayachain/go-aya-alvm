@@ -78,8 +78,8 @@ func ( l *LState ) MFS_LookupDir ( path string ) (*mfs.Directory, error) {
 	}
 }
 
-/// Files
 func ( l *LState ) MFS_ReadAll( file *mfs.File, offset int64 ) ([]byte, error) {
+
 	rfd, err := file.Open( mfs.Flags{Read:true} )
 	if err != nil {
 		return nil, err

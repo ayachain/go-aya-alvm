@@ -1,9 +1,10 @@
 package lua
 
 import (
+	"errors"
 	"fmt"
+	"github.com/ipfs/go-mfs"
 	"io"
-	"os"
 	"runtime"
 	"strconv"
 	"strings"
@@ -30,8 +31,9 @@ var baseFuncs = map[string]LGFunction{
 	"error":          baseError,
 	"getfenv":        baseGetFEnv,
 	"getmetatable":   baseGetMetatable,
-	"load":           baseLoad,
 	"loadfile":       baseLoadFile,
+	//如下两个方法，是不安全的，如果出现远程调用，可能会导致原AAPP的脚本代码被覆写，出现意料之外的情况
+	"load":           baseLoad,
 	"loadstring":     baseLoadString,
 	"next":           baseNext,
 	"pcall":          basePCall,
@@ -69,13 +71,37 @@ func baseCollectGarbage(L *LState) int {
 }
 
 func baseDoFile(L *LState) int {
+
 	src := L.ToString(1)
 	top := L.GetTop()
-	fn, err := L.LoadFile(src)
+
+	path, err := checkScriptPath(src)
 	if err != nil {
 		L.Push(LString(err.Error()))
 		L.Panic(L)
 	}
+
+	ifi, err := L.MFS_LookupFile(path)
+	if err != nil {
+		L.Push(LString(err.Error()))
+		L.Panic(L)
+		return L.GetTop() - top
+	}
+
+	rd, err := ifi.Open(mfs.Flags{Read:true})
+	if err != nil {
+		L.Push(LString(err.Error()))
+		L.Panic(L)
+		return L.GetTop() - top
+	}
+
+	fn, err := L.Load( rd, path )
+	if err != nil {
+		L.Push(LString(err.Error()))
+		L.Panic(L)
+		return L.GetTop() - top
+	}
+
 	L.Push(fn)
 	L.Call(0, MultRet)
 	return L.GetTop() - top
@@ -168,55 +194,75 @@ func loadaux(L *LState, reader io.Reader, chunkname string) int {
 }
 
 func baseLoad(L *LState) int {
-	fn := L.CheckFunction(1)
-	chunkname := L.OptString(2, "?")
-	top := L.GetTop()
-	buf := []string{}
-	for {
-		L.SetTop(top)
-		L.Push(fn)
-		L.Call(0, 1)
-		ret := L.reg.Pop()
-		if ret == LNil {
-			break
-		} else if LVCanConvToString(ret) {
-			str := ret.String()
-			if len(str) > 0 {
-				buf = append(buf, string(str))
-			} else {
-				break
-			}
-		} else {
-			L.Push(LNil)
-			L.Push(LString("reader function must return a string"))
-			return 2
-		}
-	}
-	return loadaux(L, strings.NewReader(strings.Join(buf, "")), chunkname)
+
+	L.RaiseError("loadstring is not supported in alvm aapp.")
+	return 0
+
+	//若从远端调用来baseload，可能会导致脚本注入
+	//fn := L.CheckFunction(1)
+	//chunkname := L.OptString(2, "?")
+	//
+	//top := L.GetTop()
+	//buf := []string{}
+	//
+	//for {
+	//	L.SetTop(top)
+	//	L.Push(fn)
+	//	L.Call(0, 1)
+	//	ret := L.reg.Pop()
+	//	if ret == LNil {
+	//		break
+	//	} else if LVCanConvToString(ret) {
+	//		str := ret.String()
+	//		if len(str) > 0 {
+	//			buf = append(buf, string(str))
+	//		} else {
+	//			break
+	//		}
+	//	} else {
+	//		L.Push(LNil)
+	//		L.Push(LString("reader function must return a string"))
+	//		return 2
+	//	}
+	//}
+	//return loadaux(L, strings.NewReader(strings.Join(buf, "")), chunkname)
 }
 
 func baseLoadFile(L *LState) int {
+
 	var reader io.Reader
 	var chunkname string
 	var err error
-	if L.GetTop() < 1 {
-		reader = os.Stdin
-		chunkname = "<stdin>"
-	} else {
-		chunkname = L.CheckString(1)
-		reader, err = os.Open(chunkname)
-		if err != nil {
-			L.Push(LNil)
-			L.Push(LString(fmt.Sprintf("can not open file: %v", chunkname)))
-			return 2
-		}
-		defer reader.(*os.File).Close()
+
+	chunkname = L.CheckString(1)
+	path, err := checkScriptPath(chunkname)
+	if err != nil {
+		L.Push(LNil)
+		L.Push(LString(fmt.Sprintf("can not open file: %v", chunkname)))
+		return 2
 	}
+
+	ifi, err := L.MFS_LookupFile(path)
+	if err != nil {
+		L.Push(LNil)
+		L.Push(LString(fmt.Sprintf("can not open file: %v", chunkname)))
+	}
+
+	reader, err = ifi.Open(mfs.Flags{Read:true})
+	if err != nil {
+		L.Push(LNil)
+		L.Push(LString(fmt.Sprintf("can not open file: %v", chunkname)))
+		return 2
+	}
+
 	return loadaux(L, reader, chunkname)
 }
 
 func baseLoadString(L *LState) int {
-	return loadaux(L, strings.NewReader(L.CheckString(1)), L.OptString(2, "<string>"))
+	L.RaiseError("loadstring is not supported in alvm aapp.")
+	return 0
+	//若从远端调用来baseload，可能会导致脚本注入
+	//return loadaux(L, strings.NewReader(L.CheckString(1)), L.OptString(2, "<string>"))
 }
 
 func baseNext(L *LState) int {
@@ -477,48 +523,54 @@ func baseXPCall(L *LState) int {
 /* load lib {{{ */
 
 func loModule(L *LState) int {
-	name := L.CheckString(1)
-	loaded := L.GetField(L.Get(RegistryIndex), "_LOADED")
-	tb := L.GetField(loaded, name)
-	if _, ok := tb.(*LTable); !ok {
-		tb = L.FindTable(L.Get(GlobalsIndex).(*LTable), name, 1)
-		if tb == LNil {
-			L.RaiseError("name conflict for module: %v", name)
-		}
-		L.SetField(loaded, name, tb)
-	}
-	if L.GetField(tb, "_NAME") == LNil {
-		L.SetField(tb, "_M", tb)
-		L.SetField(tb, "_NAME", LString(name))
-		names := strings.Split(name, ".")
-		pname := ""
-		if len(names) > 1 {
-			pname = strings.Join(names[:len(names)-1], ".") + "."
-		}
-		L.SetField(tb, "_PACKAGE", LString(pname))
-	}
 
-	caller := L.currentFrame.Parent
-	if caller == nil {
-		L.RaiseError("no calling stack.")
-	} else if caller.Fn.IsG {
-		L.RaiseError("module() can not be called from GFunctions.")
-	}
-	L.SetFEnv(caller.Fn, tb)
+	L.RaiseError("module is not supported in alvm aapp. Please use local md = require(\"Module.path.name\").")
+	return 0
 
-	top := L.GetTop()
-	for i := 2; i <= top; i++ {
-		L.Push(L.Get(i))
-		L.Push(tb)
-		L.Call(1, 0)
-	}
-	L.Push(tb)
-	return 1
+	//官方不推荐使用module来载入模块，使用require可以完成同样的功能
+	//name := L.CheckString(1)
+	//loaded := L.GetField(L.Get(RegistryIndex), "_LOADED")
+	//tb := L.GetField(loaded, name)
+	//if _, ok := tb.(*LTable); !ok {
+	//	tb = L.FindTable(L.Get(GlobalsIndex).(*LTable), name, 1)
+	//	if tb == LNil {
+	//		L.RaiseError("name conflict for module: %v", name)
+	//	}
+	//	L.SetField(loaded, name, tb)
+	//}
+	//if L.GetField(tb, "_NAME") == LNil {
+	//	L.SetField(tb, "_M", tb)
+	//	L.SetField(tb, "_NAME", LString(name))
+	//	names := strings.Split(name, ".")
+	//	pname := ""
+	//	if len(names) > 1 {
+	//		pname = strings.Join(names[:len(names)-1], ".") + "."
+	//	}
+	//	L.SetField(tb, "_PACKAGE", LString(pname))
+	//}
+	//
+	//caller := L.currentFrame.Parent
+	//if caller == nil {
+	//	L.RaiseError("no calling stack.")
+	//} else if caller.Fn.IsG {
+	//	L.RaiseError("module() can not be called from GFunctions.")
+	//}
+	//L.SetFEnv(caller.Fn, tb)
+	//
+	//top := L.GetTop()
+	//for i := 2; i <= top; i++ {
+	//	L.Push(L.Get(i))
+	//	L.Push(tb)
+	//	L.Call(1, 0)
+	//}
+	//L.Push(tb)
+	//return 1
 }
 
 var loopdetection = &LUserData{}
 
 func loRequire(L *LState) int {
+
 	name := L.CheckString(1)
 	loaded := L.GetField(L.Get(RegistryIndex), "_LOADED")
 	lv := L.GetField(loaded, name)
@@ -585,6 +637,21 @@ func baseNewProxy(L *LState) int {
 	}
 	L.Push(ud)
 	return 1
+}
+
+//脚本应该是只读的
+func checkScriptPath( path string ) (string, error) {
+
+	if !strings.HasPrefix(path, "/") {
+		return path, errors.New("paths must start with a leading slash")
+	}
+
+	if !strings.HasPrefix(path,"/Script") {
+		path = "/Script" + path
+	}
+
+	return path, nil
+
 }
 
 /* }}} */

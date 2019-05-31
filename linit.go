@@ -36,9 +36,9 @@ var luaLibs = []luaLib{
 	luaLib{OsLibName, OpenOs},
 	luaLib{StringLibName, OpenString},
 	luaLib{MathLibName, OpenMath},
-	luaLib{DebugLibName, OpenDebug},
-	luaLib{ChannelLibName, OpenChannel},
-	luaLib{CoroutineLibName, OpenCoroutine},
+	//luaLib{DebugLibName, OpenDebug},
+	//luaLib{ChannelLibName, OpenChannel},
+	//luaLib{CoroutineLibName, OpenCoroutine},
 }
 
 // OpenLibs loads the built-in libraries. It is equivalent to running OpenLoad,

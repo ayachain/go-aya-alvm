@@ -2,6 +2,7 @@ package lua
 
 import (
 	"fmt"
+	"github.com/ipfs/go-mfs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -9,7 +10,10 @@ import (
 
 /* load lib {{{ */
 
-var loLoaders = []LGFunction{loLoaderPreload, loLoaderLua}
+//loLoaderLua是从本机文件系统载入资源，在AApp中一律从MFS中载入
+//var loLoaders = []LGFunction{loLoaderPreload, loLoaderLua}
+
+var loLoaders = []LGFunction{loLoaderPreload, loLoaderMFS}
 
 func loGetPath(env string, defpath string) string {
 	path := os.Getenv(env)
@@ -47,6 +51,7 @@ func loFindFile(L *LState, name, pname string) (string, string) {
 }
 
 func OpenPackage(L *LState) int {
+
 	packagemod := L.RegisterModule(LoadLibName, loFuncs)
 
 	L.SetField(packagemod, "preload", L.NewTable())
@@ -107,6 +112,49 @@ func loLoaderLua(L *LState) int {
 func loLoadLib(L *LState) int {
 	L.RaiseError("loadlib is not supported")
 	return 0
+}
+
+func loLoaderMFS(L *LState) int {
+
+	name := L.CheckString(1)
+
+	name = strings.Replace(name, ".", string(os.PathSeparator), -1)
+	searchPath := "/Script/?.lua;/Script/?/init.lua;/Script/?/main.lua"
+	messages := []string{}
+
+	luafi := &mfs.File{}
+	var findError error
+
+	for _, pattern := range strings.Split(string(searchPath), ";") {
+
+		luapath := strings.Replace(pattern, "?", name, -1)
+
+		if luafi, findError = L.MFS_LookupFile(luapath); findError == nil {
+			break
+		} else {
+			messages = append(messages, findError.Error())
+		}
+
+	}
+
+	if findError != nil {
+		L.Push(LString(strings.Join(messages, "\n\t")))
+		return 1
+	}
+
+	frd, err := luafi.Open(mfs.Flags{Read:true})
+	if err != nil {
+		L.Push(LString(err.Error()))
+		return 1
+	}
+
+	fn, err1 := L.Load(frd, name)
+	if err1 != nil {
+		L.RaiseError(err1.Error())
+	}
+
+	L.Push(fn)
+	return 1
 }
 
 func loSeeAll(L *LState) int {

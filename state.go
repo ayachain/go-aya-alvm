@@ -30,6 +30,11 @@ const RegistryIndex = -10000
 const EnvironIndex = -10001
 const GlobalsIndex = -10002
 
+const ALVM_PATH_Script  = "/Script"
+const ALVM_PATH_Evn = "/Evn"
+const ALVM_PATH_INFO = "/Evn/info.json"
+const ALVM_PATH_Maincript = "/Script/aapp.lua"
+
 /* ApiError {{{ */
 
 type ApiError struct {
@@ -1332,13 +1337,10 @@ func (ls *LState) setFieldString(obj LValue, key string, value LValue) {
 /* }}} */
 
 /* api methods {{{ */
-func NewAVMState( aappns string, pnode *dag.ProtoNode, ind *core.IpfsNode, opts ...Options ) *LState {
+func NewAVMState( ctx context.Context, aappns string, pnode *dag.ProtoNode, ind *core.IpfsNode, opts ...Options ) *LState {
 
 	l := NewState( opts... )
 	l.ipfsnode = ind
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	dsk := datastore.NewKey("/alvm/" + aappns)
 	var nd *merkledag.ProtoNode
@@ -1373,7 +1375,7 @@ func NewAVMState( aappns string, pnode *dag.ProtoNode, ind *core.IpfsNode, opts 
 	l.ProtoNode = nd
 
 	pf := func(ctx context.Context, c cid.Cid) error {
-		log.Println("PUBLISHED.")
+		log.Printf("AApp %v : has new published cid %v", aappns, c.String())
 		//return ind.Repo.Datastore().Put(dsk, c.Bytes())
 		return nil
 	}
@@ -1390,6 +1392,36 @@ func NewAVMState( aappns string, pnode *dag.ProtoNode, ind *core.IpfsNode, opts 
 	}
 
 	l.mfsRoot = vfs
+
+	//载入代码
+	var lerr error
+	defer func() {
+		if lerr != nil {
+			l.mfsRoot.Close()
+			l.Close()
+		}
+	}()
+
+	mfil, lerr := l.MFS_LookupFile(ALVM_PATH_Maincript)
+	if lerr != nil {
+		return nil
+	}
+
+	mrd, lerr := mfil.Open( mfs.Flags{Read:true} )
+	if lerr != nil {
+		return nil
+	}
+
+	lfn, lerr := l.Load( mrd, "_aapp.lua" )
+	if lerr != nil {
+		return nil
+	}
+
+	l.Push(lfn)
+	lerr = l.PCall(0, MultRet, nil)
+	if lerr != nil {
+		return nil
+	}
 
 	return l
 }
