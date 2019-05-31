@@ -11,6 +11,7 @@ import (
 	ft "github.com/ipfs/go-unixfs"
 	"io"
 	"io/ioutil"
+	"os"
 	gopath "path"
 	"strings"
 )
@@ -303,6 +304,79 @@ func ( l *LState ) MFS_Flush( path string ) (cid.Cid, error) {
 }
 
 
+/// File
+/*
+	case "r", "rb":
+		mode = os.O_RDONLY
+		writable = false
+	case "w", "wb":
+		mode = os.O_WRONLY | os.O_CREATE
+		readable = false
+	case "a", "ab":
+		mode = os.O_WRONLY | os.O_APPEND | os.O_CREATE
+	case "r+", "rb+":
+		mode = os.O_RDWR
+	case "w+", "wb+":
+		mode = os.O_RDWR | os.O_TRUNC | os.O_CREATE
+	case "a+", "ab+":
+		mode = os.O_APPEND | os.O_RDWR | os.O_CREATE
+*/
+
+func ( l *LState ) MFS_OpenFile ( path string, flag int ) (*mfs.File, error) {
+
+	create := flag & os.O_CREATE == os.O_CREATE
+
+	fli, err := getFileHandle(l.mfsRoot, path, create, l.ProtoNode.CidBuilder())
+	if err != nil {
+		return nil, err
+	}
+
+	return fli, nil
+}
+
+func ( l *LState ) MFS_OpenWriter ( fli *mfs.File, flag int) (io.Writer, error) {
+
+	fwt, err := fli.Open(mfs.Flags{Write: true, Sync: false})
+	if err != nil {
+		return nil, err
+	}
+
+	if flag & os.O_APPEND == os.O_APPEND {
+
+		if flen, err := fwt.Size(); err != nil {
+
+			return nil, err
+
+		} else {
+
+			if _, err := fwt.Seek(flen, 0); err != nil {
+				return nil, err
+			}
+
+		}
+
+	} else if flag & os.O_TRUNC == os.O_TRUNC {
+
+		err = fwt.Truncate(0)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	return fwt, nil
+}
+
+func ( l *LState ) MFS_OpenReader ( fli *mfs.File, flag int) (io.Reader, error) {
+
+	frd, err := fli.Open(mfs.Flags{Read: true, Sync: false})
+	if err != nil {
+		return nil, err
+	}
+
+	return frd, nil
+}
+
 type statOutput struct {
 	Hash           string
 	Size           uint64
@@ -357,5 +431,57 @@ func statNode( nd ipld.Node ) ( *statOutput, error) {
 		}, nil
 	default:
 		return nil, fmt.Errorf("not unixfs node (proto or raw)")
+	}
+}
+
+func getFileHandle(r *mfs.Root, path string, create bool, builder cid.Builder) (*mfs.File, error) {
+	target, err := mfs.Lookup(r, path)
+	switch err {
+	case nil:
+		fi, ok := target.(*mfs.File)
+		if !ok {
+			return nil, fmt.Errorf("%s was not a file", path)
+		}
+		return fi, nil
+
+	case os.ErrNotExist:
+		if !create {
+			return nil, err
+		}
+
+		// if create is specified and the file doesnt exist, we create the file
+		dirname, fname := gopath.Split(path)
+		pdiri, err := mfs.Lookup(r, dirname)
+		if err != nil {
+			return nil, err
+		}
+		pdir, ok := pdiri.(*mfs.Directory)
+		if !ok {
+			return nil, fmt.Errorf("%s was not a directory", dirname)
+		}
+		if builder == nil {
+			builder = pdir.GetCidBuilder()
+		}
+
+		nd := dag.NodeWithData(ft.FilePBData(nil, 0))
+		nd.SetCidBuilder(builder)
+		err = pdir.AddChild(fname, nd)
+		if err != nil {
+			return nil, err
+		}
+
+		fsn, err := pdir.Child(fname)
+		if err != nil {
+			return nil, err
+		}
+
+		fi, ok := fsn.(*mfs.File)
+		if !ok {
+			return nil, errors.New("expected *mfs.File, didnt get it. This is likely a race condition")
+		}
+		return fi, nil
+
+	default:
+		return nil, err
 	}
 }
