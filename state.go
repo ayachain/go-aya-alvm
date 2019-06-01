@@ -1338,6 +1338,19 @@ func (ls *LState) setFieldString(obj LValue, key string, value LValue) {
 /* }}} */
 
 /* api methods {{{ */
+func (L *LState) FlushMFS() (cid.Cid, error) {
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	nd, err := mfs.FlushPath( ctx, L.mfsRoot, "/" )
+	if err != nil {
+		return cid.Undef, err
+	}
+
+	return nd.Cid(), nil
+}
+
 func NewAVMState( ctx context.Context, aappns string, pnode *dag.ProtoNode, ind *core.IpfsNode, opts ...Options ) (*LState, error) {
 
 	l := NewState( opts... )
@@ -1352,9 +1365,17 @@ func NewAVMState( ctx context.Context, aappns string, pnode *dag.ProtoNode, ind 
 		nd = pnode
 
 	case err == nil:
+
 		c, err := cid.Cast(val)
+
 		if err != nil {
 			return nil, err
+		}
+
+		//如果CID不相同，说明两次间隔启动之间，有数据更新，继续使用传入的节点，不从本地读取
+		if !c.Equals(pnode.Cid()) {
+			nd = pnode
+			break
 		}
 
 		rnd, err := ind.DAG.Get(ctx, c)
@@ -1377,9 +1398,8 @@ func NewAVMState( ctx context.Context, aappns string, pnode *dag.ProtoNode, ind 
 	l.ProtoNode = nd
 
 	pf := func(ctx context.Context, c cid.Cid) error {
-		log.Printf("AApp %v : has new published cid %v", aappns, c.String())
-		//return ind.Repo.Datastore().Put(dsk, c.Bytes())
-		return nil
+		log.Printf("AApp %v has published new cid %v", aappns, c.String())
+		return ind.Repo.Datastore().Put(dsk, c.Bytes())
 	}
 
 	vfs, err := mfs.NewRoot(

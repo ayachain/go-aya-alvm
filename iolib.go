@@ -124,13 +124,10 @@ type lFileType int
 
 const (
 	lFileFile lFileType = iota
-	lFileProcess
 )
 
 const fileDefOutIndex = 1
 const fileDefInIndex = 2
-const fileDefaultWriteBuffer = 1024
-const fileDefaultReadBuffer = 1024
 
 func checkFile(L *LState) *lFile {
 	ud := L.CheckUserData(1)
@@ -179,30 +176,6 @@ func newFile(L *LState, vfile *mfs.File, path string, flag int, writable, readab
 
 	ud.Value = lfile
 
-	//if writable {
-	//
-	//	var werr error
-	//
-	//	lfile.writer, werr = L.MFS_OpenWriter(vfile, flag)
-	//
-	//	if werr != nil {
-	//		return nil, werr
-	//	}
-	//
-	//}
-	//
-	//if readable {
-	//
-	//	rd, rerr := L.MFS_OpenReader(vfile, flag)
-	//
-	//	if rerr != nil {
-	//		return nil, rerr
-	//	}
-	//
-	//	lfile.reader = bufio.NewReaderSize( rd, fileDefaultReadBuffer )
-	//
-	//}
-
 	L.SetMetatable(ud, L.GetTypeMetatable(lFileClass))
 
 	return ud, nil
@@ -248,23 +221,11 @@ func fileIsReadable(L *LState, file *lFile) int {
 	return 0
 }
 
-var stdFiles = []struct {
-	name     string
-	file     *os.File
-	writable bool
-	readable bool
-}{
-	{"stdout", os.Stdout, true, false},
-	{"stdin", os.Stdin, false, true},
-	{"stderr", os.Stderr, true, false},
-}
-
 func OpenIo(L *LState) int {
 	mod := L.RegisterModule(IoLibName, map[string]LGFunction{}).(*LTable)
 	mt := L.NewTypeMetatable(lFileClass)
 	mt.RawSetString("__index", mt)
 	L.SetFuncs(mt, fileMethods)
-
 	mt.RawSetString("lines", L.NewClosure(fileLines, L.NewFunction(fileLinesIter)))
 
 	//for _, finfo := range stdFiles {
@@ -279,6 +240,7 @@ func OpenIo(L *LState) int {
 		mod.RawSetString(name, L.NewClosure(fn, uv))
 	}
 	mod.RawSetString("lines", L.NewClosure(ioLines, uv, L.NewClosure(ioLinesIter, uv)))
+	//mod.RawSetString("lines", L.NewClosure(ioLines, L.NewFunction(ioLinesIter)) )
 	//Modifications are being made in-place rather than returned?
 	L.Push(mod)
 	return 1
@@ -584,7 +546,7 @@ func fileLinesIter(L *LState) int {
 		L.RaiseError(err.Error())
 	}
 
-	file.seek += int64(len(buf))
+	file.seek += int64(len(buf) + 1)
 	L.Push(LString(string(buf)))
 
 	return 1
@@ -599,6 +561,17 @@ func fileLines(L *LState) int {
 	L.Push(L.NewClosure(fileLinesIter, L.Get(UpvalueIndex(1)), ud))
 	return 1
 }
+
+func ioLines(L *LState) int {
+	path := L.CheckString(1)
+	ud, err := newFile(L, nil, path, os.O_RDONLY, false, true)
+	if err != nil {
+		return 0
+	}
+	L.Push(L.NewClosure(ioLinesIter, L.Get(UpvalueIndex(1)), ud))
+	return 1
+}
+
 
 func fileRead(L *LState) int {
 	return fileReadAux(L, checkFile(L), 2)
@@ -682,25 +655,8 @@ func ioLinesIter(L *LState) int {
 		L.RaiseError(err.Error())
 	}
 
-	file.seek += int64(len(buf))
+	file.seek += int64(len(buf) + 1)
 	L.Push(LString(string(buf)))
-
-	return 1
-}
-
-func ioLines(L *LState) int {
-	if L.GetTop() == 0 {
-		L.Push(L.Get(UpvalueIndex(2)))
-		L.Push(fileDefIn(L))
-		return 2
-	}
-
-	path := L.CheckString(1)
-	ud, err := newFile(L, nil, path, os.O_RDONLY,false, true)
-	if err != nil {
-		return 0
-	}
-	L.Push(L.NewClosure(ioLinesIter, L.Get(UpvalueIndex(1)), ud))
 	return 1
 }
 
