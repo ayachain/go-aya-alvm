@@ -527,7 +527,7 @@ func fileSeek(L *LState) int {
 
 	pos := int64( spos + L.CheckInt64(3) )
 	if pos >= file.Size() {
-		err = fmt.Errorf("offset was past end of file (%d > %d)", pos, size)
+		err = fmt.Errorf("offset was past end of file (%d > %d)", pos, file.Size())
 		goto errreturn
 	}
 
