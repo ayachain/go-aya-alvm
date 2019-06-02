@@ -25,6 +25,7 @@ var ioFuncs = map[string]LGFunction{
 }
 
 const lFileClass = "FILE*"
+const lReadBufioSize = 256
 
 type lFile struct {
 	vfp	   *mfs.File
@@ -48,7 +49,7 @@ func (lf *lFile) Size() int64 {
 
 }
 
-func (lf *lFile) getReader(L *LState) (rd io.Reader, err error) {
+func (lf *lFile) getReader(L *LState) (rd mfs.FileDescriptor, err error) {
 
 	var e error
 	var fwt mfs.FileDescriptor
@@ -84,7 +85,7 @@ func (lf *lFile) getReader(L *LState) (rd io.Reader, err error) {
 	return fwt, nil
 }
 
-func (lf *lFile) getWriter(L *LState) (wt io.Writer, err error ) {
+func (lf *lFile) getWriter(L *LState) (wt mfs.FileDescriptor, err error ) {
 
 	var e error
 	var fwt mfs.FileDescriptor
@@ -352,7 +353,7 @@ func fileReadAux(L *LState, file *lFile, idx int) int {
 		}
 	}()
 
-	buffrd := bufio.NewReader(rdclose)
+	buffrd := bufio.NewReaderSize(rdclose, lReadBufioSize)
 
 	for i := idx; i <= top; i++ {
 		switch lv := L.Get(i).(type) {
@@ -532,7 +533,8 @@ func fileLinesIter(L *LState) int {
 		L.RaiseError(err.Error())
 	}
 
-	bufrd := bufio.NewReader(rd)
+	bufrd := bufio.NewReaderSize(rd, lReadBufioSize)
+
 	buf, _, err := bufrd.ReadLine()
 
 	if err != nil {
@@ -635,7 +637,7 @@ func ioLinesIter(L *LState) int {
 		L.RaiseError(err.Error())
 	}
 
-	bufrd := bufio.NewReader(rd)
+	bufrd := bufio.NewReaderSize(rd, lReadBufioSize)
 	buf, _, err := bufrd.ReadLine()
 
 	if err != nil {

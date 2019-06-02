@@ -21,6 +21,7 @@ const (
 	ChannelLibName = "channel"
 	// CoroutineLibName is the name of the coroutine Library.
 	CoroutineLibName = "coroutine"
+	LevelDBLibName = "adb"
 )
 
 type luaLib struct {
@@ -29,13 +30,14 @@ type luaLib struct {
 }
 
 var luaLibs = []luaLib{
-	luaLib{LoadLibName, OpenPackage},
-	luaLib{BaseLibName, OpenBase},
-	luaLib{TabLibName, OpenTable},
-	luaLib{IoLibName, OpenIo},
+	{LoadLibName, OpenPackage},
+	{BaseLibName, OpenBase},
+	{TabLibName, OpenTable},
+	{IoLibName, OpenIo},
+	{StringLibName, OpenString},
+	{MathLibName, OpenMath},
+	{LevelDBLibName, OpenLevelDB},
 	//luaLib{OsLibName, OpenOs},
-	luaLib{StringLibName, OpenString},
-	luaLib{MathLibName, OpenMath},
 	//luaLib{DebugLibName, OpenDebug},
 	//luaLib{ChannelLibName, OpenChannel},
 	//luaLib{CoroutineLibName, OpenCoroutine},
