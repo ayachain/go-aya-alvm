@@ -30,6 +30,7 @@ var iteratorMethods = map[string]LGFunction{
 	"key"		: itKey,
 	"value"		: itValue,
 	"error"		: itError,
+	"release"	: itRelease,
 }
 
 var batchMethods = map[string]LGFunction {
@@ -745,4 +746,17 @@ func itError(L *LState) int {
 	}
 
 	return 1
+}
+
+func itRelease(L *LState) int {
+
+	it := checkIterator(L)
+
+	if it == nil {
+		L.Push( LString("ADB.Iterator expected") )
+	} else {
+		it.Release()
+	}
+
+	return 0
 }
