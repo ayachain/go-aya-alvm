@@ -189,7 +189,7 @@ func dbOpenFile(L *LState) int {
 
 	}
 
-	mstorage := adb.NewMFSStorage(dir)
+	mstorage := adb.NewMFSStorage(dir, path)
 
 	db, err := leveldb.Open( mstorage, nil )
 	if err != nil {

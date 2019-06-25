@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="46541a17-8f62-44fd-9079-ce732de1fe1d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/iolib.go" beforeDir="false" afterPath="$PROJECT_DIR$/iolib.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linit.go" beforeDir="false" afterPath="$PROJECT_DIR$/linit.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/leveldb.go" beforeDir="false" afterPath="$PROJECT_DIR$/leveldb.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,94 +16,29 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/linit.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="129">
-              <caret line="27" column="18" lean-forward="true" selection-start-line="27" selection-start-column="18" selection-end-line="27" selection-end-column="18" />
+            <state relative-caret-position="570">
+              <caret line="38" column="25" selection-start-line="38" selection-start-column="25" selection-end-line="38" selection-end-column="25" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/leveldb.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="11310">
+              <caret line="761" column="1" selection-start-line="761" selection-start-column="1" selection-end-line="761" selection-end-column="1" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/leveldb.go">
+        <entry file="file://$PROJECT_DIR$/state.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="10950">
-              <caret line="730" column="26" lean-forward="true" selection-start-line="730" selection-start-column="26" selection-end-line="730" selection-end-column="26" />
+            <state relative-caret-position="398">
+              <caret line="1409" column="9" lean-forward="true" selection-start-line="1404" selection-start-column="4" selection-end-line="1409" selection-end-column="9" />
               <folding>
-                <element signature="e#13#27#0" expanded="true" />
+                <element signature="e#185#543#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../../../pkg/mod/github.com/syndtr/goleveldb@v1.0.0/leveldb/db_write.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="449">
-              <caret line="370" column="11" selection-start-line="370" selection-start-column="11" selection-end-line="370" selection-end-column="11" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../../../pkg/mod/github.com/syndtr/goleveldb@v1.0.0/leveldb/db.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="7" lean-forward="true" selection-start-line="8" selection-start-column="7" selection-end-line="8" selection-end-column="7" />
-              <folding>
-                <element signature="e#212#678#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../../../pkg/mod/github.com/syndtr/goleveldb@v1.0.0/leveldb/iterator/array_iter.go">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ajson.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="231">
-              <caret line="137" column="9" selection-start-line="137" selection-start-column="3" selection-end-line="137" selection-end-column="9" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/iolib.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="561">
-              <caret line="246" column="12" lean-forward="true" selection-start-line="225" selection-start-column="4" selection-end-line="246" selection-end-column="12" />
-              <folding>
-                <element signature="e#13#96#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/go.mod">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="17" selection-start-line="17" selection-end-line="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/parse/parser.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="20" selection-start-line="5" selection-start-column="20" selection-end-line="5" selection-end-column="20" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/channellib_test.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="27" column="44" selection-start-line="27" selection-start-column="44" selection-end-line="27" selection-end-column="44" />
             </state>
           </provider>
         </entry>
@@ -120,8 +54,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>getRead</find>
-      <find>github.com/ayachain/go-aya-alvm</find>
       <find>github.com/libp2p/go-libp2p</find>
       <find>ResE</find>
       <find>newAVM</find>
@@ -150,6 +82,8 @@
       <find>levelDBFuncs</find>
       <find>openIO</find>
       <find>&quot;level</find>
+      <find>it</find>
+      <find>newkey</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/Cellar/go/1.12.5/libexec" />
@@ -177,17 +111,17 @@
         <option value="$PROJECT_DIR$/baselib.go" />
         <option value="$PROJECT_DIR$/loadlib.go" />
         <option value="$PROJECT_DIR$/mfs.go" />
-        <option value="$PROJECT_DIR$/state.go" />
         <option value="$PROJECT_DIR$/go.mod" />
         <option value="$PROJECT_DIR$/iolib.go" />
         <option value="$PROJECT_DIR$/linit.go" />
+        <option value="$PROJECT_DIR$/state.go" />
         <option value="$PROJECT_DIR$/leveldb.go" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1" />
-    <option name="y" value="24" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="47" />
+    <option name="y" value="23" />
     <option name="width" value="1251" />
     <option name="height" value="777" />
   </component>
@@ -211,32 +145,6 @@
               <item name="go-aya-alvm" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
-            <path>
-              <item name="go-aya-alvm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="Go Modules &lt;github.com/ayachain/go-aya-alvm&gt;" type="20ee2d1f:SyntheticLibraryElementNode" />
-            </path>
-            <path>
-              <item name="go-aya-alvm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="Go Modules &lt;github.com/ayachain/go-aya-alvm&gt;" type="20ee2d1f:SyntheticLibraryElementNode" />
-              <item name="goleveldb@v1.0.0" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="go-aya-alvm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="Go Modules &lt;github.com/ayachain/go-aya-alvm&gt;" type="20ee2d1f:SyntheticLibraryElementNode" />
-              <item name="goleveldb@v1.0.0" type="462c0819:PsiDirectoryNode" />
-              <item name="leveldb" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="go-aya-alvm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="Go Modules &lt;github.com/ayachain/go-aya-alvm&gt;" type="20ee2d1f:SyntheticLibraryElementNode" />
-              <item name="goleveldb@v1.0.0" type="462c0819:PsiDirectoryNode" />
-              <item name="leveldb" type="462c0819:PsiDirectoryNode" />
-              <item name="iterator" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -253,7 +161,7 @@
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../go-aya-alvm-adb" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="go.sdk" />
@@ -307,10 +215,10 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1251" height="777" extended-state="6" />
+    <frame x="47" y="23" width="1251" height="777" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25392887" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27047145" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -325,6 +233,7 @@
       <window_info anchor="bottom" id="Version Control" order="9" weight="0.23649634" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.329718" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
+      <window_info anchor="bottom" id="LuaCheck" order="12" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -383,9 +292,6 @@
           </folding>
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LICENSE">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/script_test.go">
       <provider selected="true" editor-type-id="text-editor">
@@ -512,16 +418,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/state.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="254">
-          <caret line="1363" column="41" selection-start-line="1363" selection-start-column="41" selection-end-line="1363" selection-end-column="41" />
-          <folding>
-            <element signature="e#185#543#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/channellib_test.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
@@ -546,13 +442,6 @@
             <element signature="n#!!block;n#MFS_Flush#0" />
             <element signature="n#!!block;n#statNode#0" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/go.mod">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
         </state>
       </provider>
     </entry>
@@ -584,44 +473,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/parse/parser.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="20" selection-start-line="5" selection-start-column="20" selection-end-line="5" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ajson.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="137" column="9" selection-start-line="137" selection-start-column="3" selection-end-line="137" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/iolib.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="246" column="12" lean-forward="true" selection-start-line="225" selection-start-column="4" selection-end-line="246" selection-end-column="12" />
-          <folding>
-            <element signature="e#13#96#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/linit.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="129">
-          <caret line="27" column="18" lean-forward="true" selection-start-line="27" selection-start-column="18" selection-end-line="27" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../../pkg/mod/github.com/syndtr/goleveldb@v1.0.0/leveldb/db_write.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="449">
-          <caret line="370" column="11" selection-start-line="370" selection-start-column="11" selection-end-line="370" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../../../pkg/mod/github.com/syndtr/goleveldb@v1.0.0/leveldb/batch.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="232">
@@ -636,25 +487,81 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../../pkg/mod/github.com/syndtr/goleveldb@v1.0.0/leveldb/db.go">
+    <entry file="file://$PROJECT_DIR$/LICENSE">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="7" lean-forward="true" selection-start-line="8" selection-start-column="7" selection-end-line="8" selection-end-column="7" />
-          <folding>
-            <element signature="e#212#678#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="315">
+          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/parse/parser.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="20" selection-start-line="5" selection-start-column="20" selection-end-line="5" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/go.mod">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/iolib.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="561">
+          <caret line="246" column="12" selection-start-line="225" selection-start-column="4" selection-end-line="246" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ajson.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="231">
+          <caret line="137" column="9" selection-start-line="137" selection-start-column="3" selection-end-line="137" selection-end-column="9" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../../../pkg/mod/github.com/syndtr/goleveldb@v1.0.0/leveldb/iterator/array_iter.go">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../pkg/mod/github.com/syndtr/goleveldb@v1.0.0/leveldb/db.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="7" selection-start-line="8" selection-start-column="7" selection-end-line="8" selection-end-column="7" />
+          <folding>
+            <element signature="e#212#678#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../pkg/mod/github.com/syndtr/goleveldb@v1.0.0/leveldb/db_write.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="449">
+          <caret line="370" column="11" selection-start-line="370" selection-start-column="11" selection-end-line="370" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/linit.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="38" column="25" selection-start-line="38" selection-start-column="25" selection-end-line="38" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/leveldb.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10950">
-          <caret line="730" column="26" lean-forward="true" selection-start-line="730" selection-start-column="26" selection-end-line="730" selection-end-column="26" />
+        <state relative-caret-position="11310">
+          <caret line="761" column="1" selection-start-line="761" selection-start-column="1" selection-end-line="761" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/state.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="398">
+          <caret line="1409" column="9" lean-forward="true" selection-start-line="1404" selection-start-column="4" selection-end-line="1409" selection-end-column="9" />
           <folding>
-            <element signature="e#13#27#0" expanded="true" />
+            <element signature="e#185#543#0" expanded="true" />
           </folding>
         </state>
       </provider>
